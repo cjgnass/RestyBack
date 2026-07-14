@@ -18,11 +18,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from restaurant.views import csrf, root, submit_order
+from restaurant.views import checkout, csrf, root
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/restaurant/", root),
-    path("api/restaurant/submit-order", submit_order),
+    path("api/restaurant/checkout", checkout),
     path("api/restaurant/csrf", csrf),
 ]
