@@ -6,6 +6,10 @@ import stripe
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from dotenv import load_dotenv
+from stripe.params.checkout._session_create_params import (
+    SessionCreateParams,
+    SessionCreateParamsLineItem,
+)
 
 load_dotenv()
 
@@ -32,29 +36,20 @@ def csrf(request):
 
 def checkout(request):
     try:
-        # data = json.loads(request.body)
-        print("bruh")
-        print("bruh")
-        # print(data)
-        print("bruh")
-        print("bruh")
-        print("bruh")
+        data = json.loads(request.body)
+        line_items: list[SessionCreateParamsLineItem] = list(
+            map(
+                lambda item: {"price": item["stripeId"], "quantity": item["quantity"]},
+                data,
+            )
+        )
         checkout_session = client.v1.checkout.sessions.create(
             params={
-                "line_items": [
-                    {
-                        # Provide the exact Price ID (for example, price_1234) of the product you want to sell
-                        "price": "price_1TtDpCGxknssnJ80Jjic4GPE",
-                        "quantity": 1,
-                    },
-                ],
+                "line_items": line_items,
                 "mode": "payment",
                 "success_url": DOMAIN + "?success=true",
             }
         )
-        print()
-        print(checkout_session.url)
-        print()
         return JsonResponse({"url": checkout_session.url})
     except Exception as e:
         return JsonResponse({"message": str(e)})
